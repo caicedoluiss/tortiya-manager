@@ -1,0 +1,87 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    checks:
+        name: Checks
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22.16.x"
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: "8.0.x"
+
+            - name: Install Node.js dependencies
+              working-directory: client/WebApp
+              run: npm ci
+
+            - name: Lint React App
+              working-directory: client/WebApp
+              run: npm run lint
+
+            - name: Restore .NET dependencies
+              run: dotnet restore TortiYaManager.sln
+
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        needs: checks
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22.16.x"
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: "8.0.x"
+
+            - name: Install Node.js dependencies
+              working-directory: client/WebApp
+              run: npm ci
+
+            - name: Build React App
+              working-directory: client/WebApp
+              run: npm run build
+
+            - name: Build .NET Solution
+              run: dotnet build TortiYaManager.sln --configuration Release
+
+    test:
+        name: Test
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+            - uses: actions/checkout@v4
+
+            #   - name: Setup Node.js
+            #     uses: actions/setup-node@v4
+            #     with:
+            #       node-version: '22.16.x'
+
+            #   - name: Test React App
+            #     working-directory: client/WebApp
+            #     run: npm ci && npm test -- --watchAll=false
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: "8.0.x"
+
+            - name: Test .NET Solution
+              run: dotnet test TortiYaManager.sln --no-build --verbosity normal
