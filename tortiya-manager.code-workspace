@@ -1,23 +1,26 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "server/TortiYaManager.WebAPI"
-		},
-		{
-			"path": "server/TortiYaManager.Application"
-		},
-		{
-			"path": "server/TortiYaManager.Infrastructure"
-		},
-		{
-			"path": "server/TortiYaManager.Core"
-		},
-		{
-			"path": "client/WebApp"
-		}
-	],
-	"settings": {}
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "server/TortiYaManager.WebAPI"
+        },
+        {
+            "path": "server/TortiYaManager.Application"
+        },
+        {
+            "path": "server/TortiYaManager.Infrastructure"
+        },
+        {
+            "path": "server/TortiYaManager.Core"
+        },
+        {
+            "path": "server/SharedLib"
+        },
+        {
+            "path": "client/WebApp"
+        }
+    ],
+    "settings": {}
 }
