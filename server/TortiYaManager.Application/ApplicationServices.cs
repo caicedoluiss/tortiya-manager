@@ -18,5 +18,6 @@ public static class ApplicationServices
     private static void AddQueries(IServiceCollection services)
     {
         services.AddScoped<IAppRequestHandler<GetProductsQuery.QueryArgs, GetProductsQuery.QueryResult>, GetProductsQuery.Handler>();
+        services.AddScoped<IAppRequestHandler<GetOrdersQuery.QueryArgs, GetOrdersQuery.QueryResult>, GetOrdersQuery.Handler>();
     }
 }
