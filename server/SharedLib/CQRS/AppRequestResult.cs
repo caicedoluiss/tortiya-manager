@@ -3,32 +3,32 @@ using System.Linq;
 
 namespace SharedLib.CQRS;
 
-public interface IAppResultBase
+public interface IAppRequestResultBase
 {
     bool IsSuccess { get; }
     public IEnumerable<(string field, string error)> ValidationErrors { get; }
     string Message { get; }
 }
 
-public interface IAppResult<out TValue> : IAppResultBase
+public interface IAppRequestResult<out TValue> : IAppRequestResultBase
 {
     TValue? Value { get; }
 }
 
 
-public record AppResultBase : IAppResultBase
+public record AppRequestResultBase : IAppRequestResultBase
 {
     public bool IsSuccess { get; }
     public IEnumerable<(string field, string error)> ValidationErrors { get; } = [];
     public string Message { get; init; } = string.Empty;
 
-    public AppResultBase(bool isSuccess = false)
+    public AppRequestResultBase(bool isSuccess = false)
     {
         IsSuccess = isSuccess;
         Message = isSuccess ? string.Empty : "Application request error result.";
     }
 
-    public AppResultBase(IEnumerable<(string field, string error)> validationErrors)
+    public AppRequestResultBase(IEnumerable<(string field, string error)> validationErrors)
     {
         IsSuccess = validationErrors == null || !validationErrors.Any();
         Message = IsSuccess ? string.Empty : "There are some validation errors.";
@@ -36,21 +36,21 @@ public record AppResultBase : IAppResultBase
     }
 }
 
-public record AppResult<TValue> : AppResultBase, IAppResult<TValue>
+public record AppRequestResult<TValue> : AppRequestResultBase, IAppRequestResult<TValue>
 {
     public TValue? Value { get; }
 
-    public AppResult() : base(false)
+    public AppRequestResult() : base(false)
     {
         Value = default;
     }
 
-    public AppResult(IEnumerable<(string field, string error)> validationErrors) : base(validationErrors)
+    public AppRequestResult(IEnumerable<(string field, string error)> validationErrors) : base(validationErrors)
     {
         Value = default;
     }
 
-    public AppResult(TValue value) : base(true)
+    public AppRequestResult(TValue value) : base(true)
     {
         Value = value;
     }
