@@ -1,23 +1,24 @@
 using SharedLib.CQRS;
 using TortiYaManager.Application.Sales.DTOs;
-using TortiYaManager.Core.Sales;
 
 namespace TortiYaManager.Application.Sales.Queries;
 
 public class GetOrdersQuery
 {
-    public record QueryArgs();
+    public record QueryArgs(string ClientDate);
     public record QueryResult(IEnumerable<OrderDto> Orders);
 
     public class Handler : AppRequestHandler<QueryArgs, QueryResult>
     {
         protected override Task<QueryResult> ExecuteAsync(QueryArgs args, CancellationToken cancellationToken = default)
         {
+            var clientDate = Utils.ParseIso8601DateTimeString(args.ClientDate);
+
             return Task.FromResult(new QueryResult([
                 new OrderDto
                 {
                     Id = "1",
-                    Date = DateTime.UtcNow.ToString(Constants.DATE_TIME_FORMAT),
+                    Date = clientDate.ToString(Constants.DATE_TIME_FORMAT),
                     PaymentMethod = "Efectivo",
                     Items = [
                         new OrderItemDto { Id = "1", Name = "Product 1", Quantity = 2, Charge = 10.0m, Cost = 5.0m },
@@ -27,7 +28,7 @@ public class GetOrdersQuery
                 new OrderDto
                 {
                     Id = "2",
-                    Date = DateTime.UtcNow.AddDays(-1).ToString(Constants.DATE_TIME_FORMAT),
+                    Date = clientDate.ToString(Constants.DATE_TIME_FORMAT),
                     PaymentMethod = null,
                     Items = [
                         new OrderItemDto { Id = "3", Name = "Product 3", Quantity = 3, Charge = null, Cost = 15.0m },
@@ -36,7 +37,7 @@ public class GetOrdersQuery
                 new OrderDto
                 {
                     Id = "3",
-                    Date = DateTime.UtcNow.AddDays(-2).ToString(Constants.DATE_TIME_FORMAT),
+                    Date = clientDate.ToString(Constants.DATE_TIME_FORMAT),
                     PaymentMethod = "Efectivo",
                     Items = [
                         new OrderItemDto { Id = "4", Name = "Product 1", Quantity = 2, Charge = 10.0m, Cost = 5.0m },
@@ -48,7 +49,12 @@ public class GetOrdersQuery
 
         protected override Task<IEnumerable<(string field, string error)>> ValidateAsync(QueryArgs args, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(Enumerable.Empty<(string field, string error)>());
+            List<(string, string)> errors = [];
+
+            if (!Utils.IsIso8601DateStringValid(args.ClientDate))
+                errors.Add(("clientDate", "Invalid value."));
+
+            return Task.FromResult<IEnumerable<(string, string)>>(errors);
         }
     }
 }
