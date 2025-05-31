@@ -23,9 +23,8 @@ export default function ProductModal({ product, open, onClose, onSubmit }: Props
             id: newUuid(),
             name: product.name,
             quantity,
-            noCharge: noCharge,
             cost: product.cost * quantity,
-            price: noCharge ? 0 : product.price * quantity,
+            charge: noCharge ? null : product.price * quantity,
         };
         onSubmit?.(orderItem);
         clearState();

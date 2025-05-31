@@ -14,9 +14,10 @@ export default function Orders({ orders }: Props) {
             description: order.items.map((item) => `${item.name} x${item.quantity}`).join(", "),
             paymentMethod: order.paymentMethod || "N/A",
             totalCost: order.items.reduce((total, item) => total + item.cost * item.quantity, 0),
-            totalCharge: order.noCharge
-                ? 0
-                : order.items.reduce((total, item) => total + item.price * item.quantity * (item.noCharge ? 0 : 1), 0),
+            totalCharge: order.items.reduce(
+                (total, item) => total + (!item.charge ? 0 : item.charge * item.quantity),
+                0
+            ),
         }));
     }, [orders]);
 
