@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace TortiYaManager.WebAPI;
 
-public record FieldValidationError(string Field, IEnumerable<string> Error);
+public record FieldValidationError(string Field, IEnumerable<string> Errors);
 
 public record ErrorResponse
 {

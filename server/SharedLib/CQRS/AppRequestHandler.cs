@@ -18,7 +18,7 @@ public interface IAppRequestHandler<in TRequest>
 
 public abstract class AppRequestHandler<TArgs, TResult> : IAppRequestHandler<TArgs, TResult>
 {
-    protected abstract Task<IEnumerable<(string field, string error)>> ValidateAsync(TArgs request, CancellationToken cancellationToken = default);
+    protected abstract Task<IEnumerable<(string field, string error)>> ValidateAsync(TArgs args, CancellationToken cancellationToken = default);
     protected abstract Task<TResult> ExecuteAsync(TArgs args, CancellationToken cancellationToken = default);
 
     public async Task<IAppRequestResult<TResult>> HandleAsync(IAppRequest<TArgs> request, CancellationToken cancellationToken = default)
