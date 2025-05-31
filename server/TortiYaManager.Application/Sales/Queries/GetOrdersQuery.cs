@@ -18,32 +18,29 @@ public class GetOrdersQuery
                 {
                     Id = "1",
                     Date = DateTime.UtcNow,
-                    NoCharge = false,
                     PaymentMethod = nameof(PaymentMethod.Cash),
                     Items = [
-                        new OrderItemDto { Id = "1", Name = "Product 1", Quantity = 2, Price = 10.0m, Cost = 5.0m },
-                        new OrderItemDto { Id = "2", Name = "Product 2", Quantity = 1, Price = 20.0m, Cost = 8.0m },
+                        new OrderItemDto { Id = "1", Name = "Product 1", Quantity = 2, Charge = 10.0m, Cost = 5.0m },
+                        new OrderItemDto { Id = "2", Name = "Product 2", Quantity = 1, Charge = 20.0m, Cost = 8.0m },
                     ]
                 },
                 new OrderDto
                 {
                     Id = "2",
                     Date = DateTime.UtcNow.AddDays(-1),
-                    NoCharge = true,
                     PaymentMethod = null,
                     Items = [
-                        new OrderItemDto { Id = "3", Name = "Product 3", Quantity = 3, Price = 30.0m, Cost = 15.0m },
+                        new OrderItemDto { Id = "3", Name = "Product 3", Quantity = 3, Charge = null, Cost = 15.0m },
                     ]
                 },
                 new OrderDto
                 {
                     Id = "3",
                     Date = DateTime.UtcNow,
-                    NoCharge = false,
                     PaymentMethod = nameof(PaymentMethod.Cash),
                     Items = [
-                        new OrderItemDto { Id = "4", Name = "Product 1", Quantity = 2, Price = 10.0m, Cost = 5.0m },
-                        new OrderItemDto { Id = "4", Name = "Product 2", Quantity = 1, Price = 20.0m, Cost = 8.0m, NoCharge = true }
+                        new OrderItemDto { Id = "4", Name = "Product 1", Quantity = 2, Charge = 10.0m, Cost = 5.0m },
+                        new OrderItemDto { Id = "4", Name = "Product 2", Quantity = 1, Charge = null, Cost = 8.0m }
                     ]
                 },
             ]));

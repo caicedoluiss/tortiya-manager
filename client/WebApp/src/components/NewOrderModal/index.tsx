@@ -93,7 +93,6 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
             dateTime: moment(),
             paymentMethod: paymentMethod,
             items: orderItems,
-            noCharge: false,
         };
         onSubmit?.(order);
         onClose?.();
@@ -205,11 +204,10 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
                                     ) : (
                                         orderItems.map((item) => (
                                             <tr key={item.id}>
-                                                <>{console.log(item.id)}</>
                                                 <td>{item.name}</td>
                                                 <td>{item.quantity}</td>
                                                 <td>{formatNumberAsMoney(item.cost)}</td>
-                                                <td>{item.noCharge ? "Sin Cargo" : formatNumberAsMoney(item.price)}</td>
+                                                <td>{!item.charge ? "Sin Cargo" : formatNumberAsMoney(item.charge)}</td>
                                                 <td>
                                                     <Button
                                                         color="danger"
