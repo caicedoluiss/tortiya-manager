@@ -31,7 +31,7 @@ public class OrdersEndpoints : IEndpoint
     public static void Map(IEndpointRouteBuilder app, string? prefix = null)
     {
         var basePath = WebAPIUtils.BuildEndpointRoute(prefix, "orders");
-        app.MapGet($"{basePath}", GetOrders)
+        app.MapGet($"{basePath}/{{clientDate:string}}", GetOrdersByDate)
             .WithName("GetOrders")
             .WithTags("Orders")
             .Produces<GetOrdersResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
@@ -46,10 +46,12 @@ public class OrdersEndpoints : IEndpoint
             .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError, MediaTypeNames.Application.Json);
     }
 
-    private static async Task<IResult> GetOrders(
-        [FromServices] IAppRequestsMediator appRequestsMediator, CancellationToken cancellationToken = default)
+    private static async Task<IResult> GetOrdersByDate(
+        [FromRoute] string clientDate,
+        [FromServices] IAppRequestsMediator appRequestsMediator,
+        CancellationToken cancellationToken = default)
     {
-        var appRequest = new AppRequest<GetOrdersQuery.QueryArgs>(new());
+        var appRequest = new AppRequest<GetOrdersQuery.QueryArgs>(new(clientDate));
         var appResult = await appRequestsMediator
             .SendAsync<GetOrdersQuery.QueryArgs, GetOrdersQuery.QueryResult>(appRequest, cancellationToken);
 
