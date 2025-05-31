@@ -17,7 +17,7 @@ public class GetOrdersQuery
                 new OrderDto
                 {
                     Id = "1",
-                    Date = DateTime.UtcNow,
+                    Date = DateTime.UtcNow.ToString(Constants.DATE_TIME_FORMAT),
                     PaymentMethod = "Efectivo",
                     Items = [
                         new OrderItemDto { Id = "1", Name = "Product 1", Quantity = 2, Charge = 10.0m, Cost = 5.0m },
@@ -27,7 +27,7 @@ public class GetOrdersQuery
                 new OrderDto
                 {
                     Id = "2",
-                    Date = DateTime.UtcNow.AddDays(-1),
+                    Date = DateTime.UtcNow.AddDays(-1).ToString(Constants.DATE_TIME_FORMAT),
                     PaymentMethod = null,
                     Items = [
                         new OrderItemDto { Id = "3", Name = "Product 3", Quantity = 3, Charge = null, Cost = 15.0m },
@@ -36,7 +36,7 @@ public class GetOrdersQuery
                 new OrderDto
                 {
                     Id = "3",
-                    Date = DateTime.UtcNow,
+                    Date = DateTime.UtcNow.AddDays(-2).ToString(Constants.DATE_TIME_FORMAT),
                     PaymentMethod = "Efectivo",
                     Items = [
                         new OrderItemDto { Id = "4", Name = "Product 1", Quantity = 2, Charge = 10.0m, Cost = 5.0m },
@@ -46,7 +46,7 @@ public class GetOrdersQuery
             ]));
         }
 
-        protected override Task<IEnumerable<(string field, string error)>> ValidateAsync(QueryArgs request, CancellationToken cancellationToken = default)
+        protected override Task<IEnumerable<(string field, string error)>> ValidateAsync(QueryArgs args, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(Enumerable.Empty<(string field, string error)>());
         }

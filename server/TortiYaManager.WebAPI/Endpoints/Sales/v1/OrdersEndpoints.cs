@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using SharedLib.CQRS;
+using TortiYaManager.Application.Sales.Commands;
 using TortiYaManager.Application.Sales.DTOs;
 using TortiYaManager.Application.Sales.Queries;
 
@@ -13,7 +15,18 @@ namespace TortiYaManager.WebAPI.Endpoints.Sales.v1;
 
 public class OrdersEndpoints : IEndpoint
 {
+    #region Requests models
+
+    public record CreateOrderRequest(NewOrderDto Order);
+
+    #endregion
+
+    #region Responses models
+
     public record GetOrdersResponse(IEnumerable<OrderDto> Orders);
+    public record CreateOrderResponse(OrderDto Order);
+
+    #endregion
 
     public static void Map(IEndpointRouteBuilder app, string? prefix = null)
     {
@@ -21,19 +34,41 @@ public class OrdersEndpoints : IEndpoint
         app.MapGet($"{basePath}", GetOrders)
             .WithName("GetOrders")
             .WithTags("Orders")
-            .Produces<GetOrdersResponse>(StatusCodes.Status200OK)
-            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError);
+            .Produces<GetOrdersResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
+            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError, MediaTypeNames.Application.Json);
+
+        app.MapPost($"{basePath}", CreateOrder)
+            .WithName("CreateOrder")
+            .WithTags("Orders")
+            .Accepts<CreateOrderRequest>(MediaTypeNames.Application.Json)
+            .Produces<CreateOrderResponse>(StatusCodes.Status201Created, MediaTypeNames.Application.Json)
+            .Produces<ErrorResponse>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)
+            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError, MediaTypeNames.Application.Json);
     }
 
     private static async Task<IResult> GetOrders(
         [FromServices] IAppRequestsMediator appRequestsMediator, CancellationToken cancellationToken = default)
     {
-        var request = new AppRequest<GetOrdersQuery.QueryArgs>(new());
-        var result = await appRequestsMediator
-            .SendAsync<GetOrdersQuery.QueryArgs, GetOrdersQuery.QueryResult>(request, cancellationToken);
+        var appRequest = new AppRequest<GetOrdersQuery.QueryArgs>(new());
+        var appResult = await appRequestsMediator
+            .SendAsync<GetOrdersQuery.QueryArgs, GetOrdersQuery.QueryResult>(appRequest, cancellationToken);
 
-        return result.IsSuccess ?
-            Results.Ok(new GetOrdersResponse(result.Value!.Orders)) :
-            Results.BadRequest(new ErrorResponse(result.ValidationErrors));
+        return appResult.IsSuccess ?
+            Results.Ok(new GetOrdersResponse(appResult.Value!.Orders)) :
+            Results.BadRequest(new ErrorResponse(appResult.ValidationErrors));
+    }
+
+    private static async Task<IResult> CreateOrder(
+        [FromBody] CreateOrderRequest request,
+        [FromServices] IAppRequestsMediator appRequestsMediator,
+        CancellationToken cancellationToken = default)
+    {
+        var appRequest = new AppRequest<CreateOrderCommand.CommandArgs>(new(request.Order));
+        var appResult = await appRequestsMediator
+            .SendAsync<CreateOrderCommand.CommandArgs, CreateOrderCommand.CommandResult>(appRequest, cancellationToken);
+
+        return appResult.IsSuccess ?
+            Results.Json(new CreateOrderResponse(appResult.Value!.Order), statusCode: StatusCodes.Status201Created) :
+            Results.BadRequest(new ErrorResponse(appResult.ValidationErrors));
     }
 }

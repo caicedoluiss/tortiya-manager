@@ -3,16 +3,17 @@ using System.Collections.Generic;
 
 namespace TortiYaManager.Core.Sales;
 
-public class Orders
+public class Order
 {
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public DateTime Date { get; set; }
     public string? PaymentMethod { get; set; }
-    public IEnumerable<OrderItem>? Items { get; set; }
+    public IEnumerable<OrderItem> Items { get; set; } = [];
 }
 
 public class OrderItem
 {
-    public string Id { get; set; } = string.Empty;
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public decimal? Charge { get; set; }
