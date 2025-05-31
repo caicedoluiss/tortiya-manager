@@ -6,7 +6,7 @@ namespace TortiYaManager.Core.Sales;
 public class Orders
 {
     public DateTime Date { get; set; }
-    public PaymentMethod? PaymentMethod { get; set; }
+    public string? PaymentMethod { get; set; }
     public IEnumerable<OrderItem>? Items { get; set; }
 }
 
