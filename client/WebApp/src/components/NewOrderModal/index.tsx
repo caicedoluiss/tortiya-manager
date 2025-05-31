@@ -18,7 +18,6 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import type { OrderItem } from "../../types/OrderItem";
 import { useState } from "react";
 import type { Product } from "../../types/Product";
-import { PAYMENT_METHOD_CASH, PAYMENT_METHOD_NEQUI, type PaymentMethod } from "../../types/PaymentMethod";
 import ProductModal from "./ProductModal";
 import formatNumberAsMoney from "../../utils/formatNumberAsMoney";
 import type { Order } from "../../types/Order";
@@ -74,6 +73,8 @@ const demoProducts: Product[] = [
     },
 ];
 
+const demoPaymentMethods = ["Efectivo", "Nequi"];
+
 type Props = {
     open: boolean;
     onClose?: () => void;
@@ -81,7 +82,7 @@ type Props = {
 };
 export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
     const products = demoProducts;
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PAYMENT_METHOD_CASH);
+    const [paymentMethod, setPaymentMethod] = useState<string>(demoPaymentMethods[0]);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [showProductModal, setShowProductModal] = useState<boolean>(false);
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
@@ -116,7 +117,7 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
 
     const clearState = () => {
         setOrderItems([]);
-        setPaymentMethod(PAYMENT_METHOD_CASH);
+        setPaymentMethod(demoPaymentMethods[0]);
         setSelectedProduct(null);
     };
 
@@ -158,10 +159,13 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
                                     name="paymentMethod"
                                     placeholder="Seleccion un método de pago"
                                     value={paymentMethod}
-                                    onChange={(_, newValue) => setPaymentMethod(newValue as PaymentMethod)}
+                                    onChange={(_, newValue) => setPaymentMethod(newValue as string)}
                                 >
-                                    <Option value={PAYMENT_METHOD_CASH}>Efectivo</Option>
-                                    <Option value={PAYMENT_METHOD_NEQUI}>Nequi</Option>
+                                    {demoPaymentMethods.map((pm) => (
+                                        <Option key={pm} value={pm}>
+                                            {pm}
+                                        </Option>
+                                    ))}
                                 </Select>
                             </FormControl>
                         </Box>

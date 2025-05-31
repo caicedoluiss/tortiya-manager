@@ -18,7 +18,7 @@ public class GetOrdersQuery
                 {
                     Id = "1",
                     Date = DateTime.UtcNow,
-                    PaymentMethod = nameof(PaymentMethod.Cash),
+                    PaymentMethod = "Efectivo",
                     Items = [
                         new OrderItemDto { Id = "1", Name = "Product 1", Quantity = 2, Charge = 10.0m, Cost = 5.0m },
                         new OrderItemDto { Id = "2", Name = "Product 2", Quantity = 1, Charge = 20.0m, Cost = 8.0m },
@@ -37,7 +37,7 @@ public class GetOrdersQuery
                 {
                     Id = "3",
                     Date = DateTime.UtcNow,
-                    PaymentMethod = nameof(PaymentMethod.Cash),
+                    PaymentMethod = "Efectivo",
                     Items = [
                         new OrderItemDto { Id = "4", Name = "Product 1", Quantity = 2, Charge = 10.0m, Cost = 5.0m },
                         new OrderItemDto { Id = "4", Name = "Product 2", Quantity = 1, Charge = null, Cost = 8.0m }
