@@ -33,8 +33,6 @@ public class ProductsEndpoints : IEndpoint
         var result = await appRequestsMediator
             .SendAsync<GetProductsQuery.QueryArgs, GetProductsQuery.QueryResult>(request, cancellationToken);
 
-        return result.IsSuccess ?
-            Results.Ok(new GetProductsResponse(result.Value!.Products)) :
-            Results.BadRequest(new ErrorResponse(result.ValidationErrors));
+        return Results.Ok(new GetProductsResponse(result.Value!.Products));
     }
 }

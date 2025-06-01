@@ -31,7 +31,7 @@ public class OrdersEndpoints : IEndpoint
     public static void Map(IEndpointRouteBuilder app, string? prefix = null)
     {
         var basePath = WebAPIUtils.BuildEndpointRoute(prefix, "orders");
-        app.MapGet($"{basePath}/{{clientDate:string}}", GetOrdersByDate)
+        app.MapGet($"{basePath}/{{clientDate}}", GetOrdersByDate)
             .WithName("GetOrders")
             .WithTags("Orders")
             .Produces<GetOrdersResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
