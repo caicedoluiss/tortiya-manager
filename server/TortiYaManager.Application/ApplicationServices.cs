@@ -20,6 +20,7 @@ public static class ApplicationServices
 
     private static void AddQueries(IServiceCollection services)
     {
+        services.AddScoped<IAppRequestHandler<GetPaymentMethodsQuery.QueryArgs, GetPaymentMethodsQuery.QueryResult>, GetPaymentMethodsQuery.Handler>();
         services.AddScoped<IAppRequestHandler<GetProductsQuery.QueryArgs, GetProductsQuery.QueryResult>, GetProductsQuery.Handler>();
         services.AddScoped<IAppRequestHandler<GetOrdersQuery.QueryArgs, GetOrdersQuery.QueryResult>, GetOrdersQuery.Handler>();
     }
