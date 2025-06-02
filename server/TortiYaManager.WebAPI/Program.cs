@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TortiYaManager.WebAPI;
 using TortiYaManager.Application;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 internal class Program
 {
@@ -14,7 +15,6 @@ internal class Program
         {
             options.AddServerHeader = false;
         });
-
         builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
         {
             options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
@@ -23,29 +23,38 @@ internal class Program
         builder.Services.AddApplicationServices();
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-        builder.Services.AddSwaggerGen(c =>
+
+        bool isDebugLocalOrDevEnv = builder.Environment.IsDebug() || builder.Environment.IsLocal() || builder.Environment.IsDevelopment();
+        if (isDebugLocalOrDevEnv)
         {
-            c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "TortiYaManager API", Version = "v1" });
-        });
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAllOrigins",
-                builder => builder.AllowAnyOrigin()
-                                  .AllowAnyMethod()
-                                  .AllowAnyHeader());
-        });
+            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "TortiYaManager API", Version = "v1" });
+            });
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder => builder.AllowAnyOrigin()
+                                      .AllowAnyMethod()
+                                      .AllowAnyHeader());
+            });
+        }
 
         var app = builder.Build();
 
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
+        if (isDebugLocalOrDevEnv)
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "TortiYaManager API v1");
-            c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
-        });
-        app.UseDeveloperExceptionPage();
-        app.UseCors("AllowAllOrigins");
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "TortiYaManager API v1");
+                c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+            });
+            app.UseDeveloperExceptionPage();
+
+            app.UseCors("AllowAllOrigins");
+        }
 
         string prefix = "api/v1/";
         app.MapEndpoints(prefix);
