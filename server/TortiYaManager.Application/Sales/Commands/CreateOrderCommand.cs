@@ -24,11 +24,16 @@ public class CreateOrderCommand
             if (!Utils.IsIso8601DateStringValid(args.NewOrder.ClientDate))
                 errorList.Add(("clientDate", "Invalid value."));
 
-            if (args.NewOrder.Items.Any(x => x.Charge is not null) && args.NewOrder.PaymentMethod is null)
-                errorList.Add(("paymentMethod", "Invalid value."));
+            if (!args.NewOrder.Items.Any())
+            {
+                errorList.Add(("items", "Invalid value."));
 
-            if (args.NewOrder.Items.Any(x => x.Quantity <= 0))
-                errorList.Add(("quantity", "Invalid value."));
+                if (args.NewOrder.Items.Any(x => x.Charge is not null) && args.NewOrder.PaymentMethod is null)
+                    errorList.Add(("paymentMethod", "Invalid value."));
+
+                if (args.NewOrder.Items.Any(x => x.Quantity <= 0))
+                    errorList.Add(("quantity", "Invalid value."));
+            }
 
             return Task.FromResult<IEnumerable<(string, string)>>(errorList);
         }

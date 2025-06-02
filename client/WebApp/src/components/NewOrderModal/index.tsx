@@ -16,64 +16,14 @@ import {
 } from "@mui/joy";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import type { OrderItem } from "../../types/OrderItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Product } from "../../types/Product";
 import ProductModal from "./ProductModal";
 import formatNumberAsMoney from "../../utils/formatNumberAsMoney";
 import type { Order } from "../../types/Order";
 import newUuid from "../../utils/newUuid";
 import moment from "moment";
-
-const demoProducts: Product[] = [
-    {
-        id: "1",
-        name: "Tortilla de Maíz",
-        price: 25,
-        cost: 15,
-        category: "Tortillas",
-    },
-    {
-        id: "2",
-        name: "Tortilla de Harina",
-        price: 30,
-        cost: 18,
-        category: "Tortillas",
-    },
-    { id: "3", name: "Quesadilla", price: 40, cost: 25, category: "Antojitos" },
-    { id: "4", name: "Taco de Asada", price: 35, cost: 22, category: "Tacos" },
-    { id: "5", name: "Taco al Pastor", price: 33, cost: 20, category: "Tacos" },
-    {
-        id: "6",
-        name: "Gordita de Chicharrón",
-        price: 38,
-        cost: 24,
-        category: "Antojitos",
-    },
-    {
-        id: "7",
-        name: "Enchilada Roja",
-        price: 45,
-        cost: 28,
-        category: "Antojitos",
-    },
-    { id: "8", name: "Sopes", price: 32, cost: 19, category: "Antojitos" },
-    {
-        id: "9",
-        name: "Bebida Refresco",
-        price: 20,
-        cost: 10,
-        category: "Bebidas",
-    },
-    {
-        id: "10",
-        name: "Agua de Horchata",
-        price: 18,
-        cost: 9,
-        category: "Bebidas",
-    },
-];
-
-const demoPaymentMethods = ["Efectivo", "Nequi"];
+import useApplicationState from "../../hooks/useApplicationState";
 
 type Props = {
     open: boolean;
@@ -81,17 +31,22 @@ type Props = {
     onSubmit?: (order: Order) => void;
 };
 export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
-    const products = demoProducts;
-    const [paymentMethod, setPaymentMethod] = useState<string>(demoPaymentMethods[0]);
+    const { paymentMethods, products } = useApplicationState();
+    const [paymentMethod, setPaymentMethod] = useState<string>("");
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [showProductModal, setShowProductModal] = useState<boolean>(false);
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
 
+    useEffect(() => {
+        setPaymentMethod(paymentMethods[0] ?? "");
+    }, [paymentMethods]);
+
     const handleSubmit = () => {
+        if (orderItems.length <= 0) alert("Debe agregar al menos un product a la orden.");
         clearState();
         const order: Order = {
             id: newUuid(),
-            dateTime: moment(),
+            date: moment().format(),
             paymentMethod: paymentMethod,
             items: orderItems,
         };
@@ -101,7 +56,7 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
     };
 
     const handleSelectProduct = (productId: string) => {
-        setSelectedProduct(products.find((product) => product.id === productId) || null);
+        setSelectedProduct(products.find((product: Product) => product.id === productId) || null);
         if (productId) setShowProductModal(true);
     };
 
@@ -115,9 +70,14 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
         setOrderItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
     };
 
+    const handleClose = () => {
+        onClose?.();
+        clearState();
+    };
+
     const clearState = () => {
         setOrderItems([]);
-        setPaymentMethod(demoPaymentMethods[0]);
+        setPaymentMethod(paymentMethods[0]);
         setSelectedProduct(null);
     };
 
@@ -129,7 +89,7 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
                 onClose={() => setShowProductModal(false)}
                 onSubmit={handleAddOrderItem}
             />
-            <Modal open={open} onClose={onClose}>
+            <Modal open={open} onClose={handleClose}>
                 <ModalDialog variant="soft" layout="fullscreen" sx={{ height: 1 }}>
                     <ModalClose onClick={onClose} />
                     <Typography level="h4" component="h2" sx={{ mb: 2 }}>
@@ -161,7 +121,7 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
                                     value={paymentMethod}
                                     onChange={(_, newValue) => setPaymentMethod(newValue as string)}
                                 >
-                                    {demoPaymentMethods.map((pm) => (
+                                    {paymentMethods.map((pm: string) => (
                                         <Option key={pm} value={pm}>
                                             {pm}
                                         </Option>
@@ -180,7 +140,7 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
                                 onChange={(_, newValue) => handleSelectProduct(newValue as string)}
                             >
                                 <Option value={null}>{"< Seleccione un producto >"}</Option>
-                                {products.map((product) => (
+                                {products.map((product: Product) => (
                                     <Option key={product.id} value={product.id}>
                                         {product.name} - ${product.price}
                                     </Option>
@@ -239,10 +199,16 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
                             bottom: 0,
                         }}
                     >
-                        <IconButton variant="outlined" color="danger" onClick={onClose} sx={{ minWidth: 90 }}>
+                        <IconButton variant="outlined" color="danger" onClick={handleClose} sx={{ minWidth: 90 }}>
                             Cancelar
                         </IconButton>
-                        <IconButton variant="solid" color="primary" onClick={handleSubmit} sx={{ minWidth: 80 }}>
+                        <IconButton
+                            variant="solid"
+                            color="primary"
+                            onClick={handleSubmit}
+                            sx={{ minWidth: 80 }}
+                            disabled={orderItems.length <= 0}
+                        >
                             OK
                         </IconButton>
                     </Box>

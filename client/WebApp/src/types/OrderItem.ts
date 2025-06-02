@@ -4,4 +4,11 @@ export type OrderItem = {
     quantity: number;
     charge: number | null;
     cost: number;
-}
+};
+
+export type NewOrderItem = {
+    name: string;
+    quantity: number;
+    charge: number | null;
+    cost: number;
+};
