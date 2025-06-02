@@ -21,6 +21,18 @@ export default tseslint.config(
             ...reactHooks.configs.recommended.rules,
             "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
             eqeqeq: ["error", "always"],
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    "argsIgnorePattern": "^_",
+                    "varsIgnorePattern": "^_",
+                    "caughtErrorsIgnorePattern": "^_",
+                    "destructuredArrayIgnorePattern": "^_",
+                    "ignoreRestSiblings": true,
+                    "args": "all",
+                    "caughtErrors": "all"
+                }
+            ]
         },
     }
 );

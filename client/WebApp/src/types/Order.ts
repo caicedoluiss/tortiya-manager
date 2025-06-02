@@ -1,9 +1,14 @@
-import type { Moment } from "moment";
-import type { OrderItem } from "./OrderItem";
+import type { NewOrderItem, OrderItem } from "./OrderItem";
 
 export type Order = {
     id: string;
-    dateTime: Moment;
+    date: string;
     paymentMethod: string | null;
     items: OrderItem[];
-}
+};
+
+export type NewOrder = {
+    clientDate: string;
+    paymentMethod: string | null;
+    items: NewOrderItem[];
+};

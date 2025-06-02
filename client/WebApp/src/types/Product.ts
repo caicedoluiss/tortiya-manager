@@ -3,5 +3,4 @@ export type Product = {
     name: string;
     cost: number;
     price: number;
-    category?: string;
 };

@@ -51,9 +51,9 @@ public class OrdersEndpoints : IEndpoint
         [FromServices] IAppRequestsMediator appRequestsMediator,
         CancellationToken cancellationToken = default)
     {
-        var appRequest = new AppRequest<GetOrdersQuery.QueryArgs>(new(clientDate));
+        var appRequest = new AppRequest<GetOrdersByDateQuery.QueryArgs>(new(clientDate));
         var appResult = await appRequestsMediator
-            .SendAsync<GetOrdersQuery.QueryArgs, GetOrdersQuery.QueryResult>(appRequest, cancellationToken);
+            .SendAsync<GetOrdersByDateQuery.QueryArgs, GetOrdersByDateQuery.QueryResult>(appRequest, cancellationToken);
 
         return appResult.IsSuccess ?
             Results.Ok(new GetOrdersResponse(appResult.Value!.Orders)) :

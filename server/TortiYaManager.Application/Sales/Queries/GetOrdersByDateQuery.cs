@@ -3,7 +3,7 @@ using TortiYaManager.Application.Sales.DTOs;
 
 namespace TortiYaManager.Application.Sales.Queries;
 
-public class GetOrdersQuery
+public class GetOrdersByDateQuery
 {
     public record QueryArgs(string ClientDate);
     public record QueryResult(IEnumerable<OrderDto> Orders);
