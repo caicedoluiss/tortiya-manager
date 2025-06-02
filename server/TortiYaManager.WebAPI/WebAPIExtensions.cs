@@ -1,7 +1,8 @@
 using System.Linq;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
+using TortiYaManager.Application;
 using TortiYaManager.WebAPI.Endpoints;
 
 namespace TortiYaManager.WebAPI;
@@ -21,5 +22,15 @@ public static class WebAPIExtensions
     public static void MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app, string? prefix = null) where TEndpoint : IEndpoint
     {
         TEndpoint.Map(app, prefix);
+    }
+
+    public static bool IsDebug(this IWebHostEnvironment webHostEnvironment)
+    {
+        return webHostEnvironment.IsEnvironment(nameof(ApplicationEnvironment.Debug));
+    }
+
+    public static bool IsLocal(this IWebHostEnvironment webHostEnvironment)
+    {
+        return webHostEnvironment.IsEnvironment(nameof(ApplicationEnvironment.Local));
     }
 }
