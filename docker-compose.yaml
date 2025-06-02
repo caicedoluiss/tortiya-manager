@@ -1,0 +1,33 @@
+name: tortiya_manager
+services:
+    api:
+        build:
+            context: .
+            dockerfile: ./server/TortiYaManager.WebAPI/Dockerfile
+        image: tortiya_manager-api:debug
+        pull_policy: build
+        container_name: tortiya_manager-api
+        ports:
+            - "8080:80"
+        networks:
+            - tortiya_manager
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Debug
+            - ASPNETCORE_HTTP_PORTS=80
+    webapp:
+        build:
+            context: ./client/WebApp
+            dockerfile: Dockerfile
+            args:
+                - API_URL=http://localhost:8080/api
+        image: tortiya_manager-webapp:debug
+        pull_policy: build
+        container_name: tortiya_manager-webapp
+        ports:
+            - "8081:80"
+        networks:
+            - tortiya_manager
+networks:
+    tortiya_manager:
+        name: tortiya_manager-debug
+        driver: bridge

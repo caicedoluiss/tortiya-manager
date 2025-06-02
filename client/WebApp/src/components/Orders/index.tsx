@@ -35,17 +35,19 @@ export default function Orders() {
     }, [fetchOrders, selectedDate]);
 
     const rows = useMemo(() => {
-        return orders.map((order) => ({
-            id: order.id,
-            time: moment(order.date).format("HH:mm"),
-            description: order.items.map((item) => `${item.name} x${item.quantity}`).join(", "),
-            paymentMethod: order.paymentMethod || "N/A",
-            totalCost: order.items.reduce((total, item) => total + item.cost * item.quantity, 0),
-            totalCharge: order.items.reduce(
-                (total, item) => total + (!item.charge ? 0 : item.charge * item.quantity),
-                0
-            ),
-        }));
+        return (
+            orders?.map((order) => ({
+                id: order.id,
+                time: moment(order.date).format("HH:mm"),
+                description: order.items.map((item) => `${item.name} x${item.quantity}`).join(", "),
+                paymentMethod: order.paymentMethod || "N/A",
+                totalCost: order.items.reduce((total, item) => total + item.cost * item.quantity, 0),
+                totalCharge: order.items.reduce(
+                    (total, item) => total + (!item.charge ? 0 : item.charge * item.quantity),
+                    0
+                ),
+            })) ?? []
+        );
     }, [orders]);
 
     const handleDateChange = (date: Date) => {

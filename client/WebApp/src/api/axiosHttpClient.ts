@@ -1,8 +1,14 @@
 import axios from "axios";
-import { BAD_REQUEST_RESPONSE_STATUS, NO_REQUEST_RESPONSE_STATUS, NOT_ALLOWED_REQUEST_RESPONSE_STATUS, SERVER_ERROR_RESPONSE_STATUS, UNHANDLED_REQUEST_RESPONSE_STATUS } from "./errorResponseCodes";
+import {
+    BAD_REQUEST_RESPONSE_STATUS,
+    NO_REQUEST_RESPONSE_STATUS,
+    NOT_ALLOWED_REQUEST_RESPONSE_STATUS,
+    SERVER_ERROR_RESPONSE_STATUS,
+    UNHANDLED_REQUEST_RESPONSE_STATUS,
+} from "./errorResponseCodes";
 
 const axiosHttpClient = axios.create({
-    baseURL: import.meta.env.VITE_APPLICATION_API_URL,
+    baseURL: import.meta.env.VITE_API_URL,
     headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -21,7 +27,7 @@ axiosHttpClient.interceptors.response.use(
                 code: NO_REQUEST_RESPONSE_STATUS,
                 value: {
                     message: error.message,
-                }
+                },
             });
         }
 
@@ -30,8 +36,8 @@ axiosHttpClient.interceptors.response.use(
                 code: BAD_REQUEST_RESPONSE_STATUS,
                 value: {
                     message: "Bad request.",
-                    ...(!error.response.data? {} : error.response.data)
-                }
+                    ...(!error.response.data ? {} : error.response.data),
+                },
             });
         }
 
@@ -40,21 +46,24 @@ axiosHttpClient.interceptors.response.use(
                 code: NOT_ALLOWED_REQUEST_RESPONSE_STATUS,
                 value: {
                     message: "Not allowed.",
-                }
+                },
             });
         }
 
         if (error.response.status >= 500) {
             return Promise.reject({
-                code:   SERVER_ERROR_RESPONSE_STATUS,
+                code: SERVER_ERROR_RESPONSE_STATUS,
                 value: {
                     message: "Internal server error.",
-                    ...(!error.response.data? {} : error.response.data)
-                }
+                    ...(!error.response.data ? {} : error.response.data),
+                },
             });
         }
 
-        return Promise.reject({ code: UNHANDLED_REQUEST_RESPONSE_STATUS, value: { message: "An error has occurred." }});
+        return Promise.reject({
+            code: UNHANDLED_REQUEST_RESPONSE_STATUS,
+            value: { message: "An error has occurred." },
+        });
     }
 );
 
