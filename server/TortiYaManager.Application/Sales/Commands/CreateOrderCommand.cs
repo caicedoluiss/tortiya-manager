@@ -1,5 +1,6 @@
 using SharedLib.CQRS;
 using TortiYaManager.Application.Sales.DTOs;
+using TortiYaManager.Application.Sales.Repositories;
 
 namespace TortiYaManager.Application.Sales.Commands;
 
@@ -8,13 +9,14 @@ public class CreateOrderCommand
     public record CommandArgs(NewOrderDto NewOrder);
     public record CommandResult(OrderDto Order);
 
-    public class Handler : AppRequestHandler<CommandArgs, CommandResult>
+    public class Handler(IOrdersRespository repository) : AppRequestHandler<CommandArgs, CommandResult>
     {
         protected override Task<CommandResult> ExecuteAsync(CommandArgs args, CancellationToken cancellationToken = default)
         {
             var order = args.NewOrder.ToCore();
-            OrderDto orderDto = OrderDto.FromCore(order);
-            return Task.FromResult<CommandResult>(new(orderDto));
+            var result = repository.Create(order);
+
+            return Task.FromResult<CommandResult>(new(OrderDto.FromCore(result)));
         }
 
         protected override Task<IEnumerable<(string field, string error)>> ValidateAsync(CommandArgs args, CancellationToken cancellationToken = default)

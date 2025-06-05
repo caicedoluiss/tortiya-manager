@@ -34,7 +34,7 @@ public record NewOrderDto
     {
         Date = Utils.ParseIso8601DateTimeString(ClientDate).UtcDateTime,
         PaymentMethod = Items.Any(x => x.Charge is not null) ? PaymentMethod : null,
-        Items = Items.Select(x => x.ToCore())
+        Items = Items.Select(x => x.ToCore()).ToList()
     };
 }
 

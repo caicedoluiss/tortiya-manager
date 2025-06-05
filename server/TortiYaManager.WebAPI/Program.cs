@@ -2,8 +2,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using TortiYaManager.WebAPI;
 using TortiYaManager.Application;
+using TortiYaManager.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using System.Linq;
+using System;
+using Microsoft.EntityFrameworkCore;
 
 internal class Program
 {
@@ -21,6 +25,7 @@ internal class Program
         });
 
         builder.Services.AddApplicationServices();
+        builder.Services.AddInfrastructureServices(builder.Configuration);
 
         builder.Services.AddEndpointsApiExplorer();
 
@@ -43,6 +48,19 @@ internal class Program
 
         var app = builder.Build();
 
+        if (args.Contains("migrate")) // No migrations actually, only setup and db seeding
+        {
+            using var scope = app.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            if (context.Database.EnsureCreated())
+            {
+                Console.WriteLine("Setting up database and data seeding...");
+                SeedData.InitializeDatabase(context);
+                Console.WriteLine("Database seeding complete...");
+            }
+            return;
+        }
+
         if (isDebugLocalOrDevEnv)
         {
             app.UseSwagger();
@@ -55,6 +73,8 @@ internal class Program
 
             app.UseCors("AllowAllOrigins");
         }
+
+
 
         string prefix = "api/v1/";
         app.MapEndpoints(prefix);
