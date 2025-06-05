@@ -1,11 +1,25 @@
 name: tortiya_manager
 services:
-    api:
+    migrations_job:
         build:
             context: .
             dockerfile: ./server/TortiYaManager.WebAPI/Dockerfile
         image: tortiya_manager-api:debug
         pull_policy: build
+        command: [TortiYaManager.WebAPI.dll, migrate]
+        networks:
+            - tortiya_manager
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Debug
+            - CosmosDbSettings__DbName=
+            - CosmosDbSettings__AccountEndpoint=
+            - CosmosDbSettings__AccountKey=
+    api:
+        depends_on:
+            migrations_job:
+                condition: service_completed_successfully # Waits until container is finished
+        image: tortiya_manager-api:debug
+        pull_policy: never # always, missing, never, build
         container_name: tortiya_manager-api
         ports:
             - "8080:80"
@@ -14,6 +28,9 @@ services:
         environment:
             - ASPNETCORE_ENVIRONMENT=Debug
             - ASPNETCORE_HTTP_PORTS=80
+            - CosmosDbSettings__DbName=
+            - CosmosDbSettings__AccountEndpoint=
+            - CosmosDbSettings__AccountKey=
     webapp:
         build:
             context: ./client/WebApp

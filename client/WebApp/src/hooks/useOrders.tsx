@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { getOrdersByDate, postOrder } from "../api/v1/orders";
-import parseDateToIso8601String from "../utils/parseDateToIso8601String";
 import type { ErrorResponse } from "../types/errorResponse";
 import { BAD_REQUEST_RESPONSE_STATUS } from "../api/errorResponseCodes";
 import type { Order } from "../types/Order";
@@ -8,7 +7,7 @@ import type { Order } from "../types/Order";
 export default function useOrders() {
     const getAllByDate = useCallback(async (date: Date) => {
         try {
-            const { orders } = await getOrdersByDate(parseDateToIso8601String(date));
+            const { orders } = await getOrdersByDate(date);
             return orders;
         } catch (error) {
             const axiosError = (error as ErrorResponse) || {};

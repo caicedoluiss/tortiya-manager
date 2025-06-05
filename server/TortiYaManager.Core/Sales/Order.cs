@@ -3,12 +3,11 @@ using System.Collections.Generic;
 
 namespace TortiYaManager.Core.Sales;
 
-public class Order
+public class Order : DbEntityBase
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
     public DateTime Date { get; set; }
     public string? PaymentMethod { get; set; }
-    public IEnumerable<OrderItem> Items { get; set; } = [];
+    public List<OrderItem> Items { get; set; } = [];
 }
 
 public class OrderItem
