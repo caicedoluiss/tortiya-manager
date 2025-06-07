@@ -15,10 +15,13 @@ public sealed class OrdersRepository(ApplicationDbContext context) : IOrdersResp
 
     public async Task<IReadOnlyCollection<Order>> GetByDateAsync(DateTimeOffset clientDate, bool track = false, CancellationToken cancellationToken = default)
     {
+        // Get Utc DateTime from Client Date (DateTimeOffset) at 12AM from day.
+        // In this case a new instance was required as Date property doesn't store offset information for converting to Utc later
+        var clientDateUtc = new DateTimeOffset(clientDate.Date, clientDate.Offset).UtcDateTime;
+        var nextDateUtc = clientDateUtc.AddDays(1);
+
         var query = context.Orders.AsQueryable();
         if (!track) query = query.AsNoTracking();
-        var clientDateUtc = clientDate.Date.ToUniversalTime();
-        var nextDateUtc = clientDateUtc.AddDays(1);
 
         query = query.Where(o => o.Date >= clientDateUtc && o.Date < nextDateUtc);
         var result = await query.ToListAsync(cancellationToken);
