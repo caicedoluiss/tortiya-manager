@@ -1,4 +1,3 @@
-import { Box, Sheet, Table, Typography } from "@mui/joy";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Order } from "../../types/Order";
 import formatNumberAsMoney from "../../utils/formatNumberAsMoney";
@@ -8,6 +7,18 @@ import useOrders from "../../hooks/useOrders";
 import moment from "moment";
 import FAB from "../FAB";
 import useApplicationState from "../../hooks/useApplicationState";
+import {
+    Box,
+    Container,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableFooter,
+    TableHead,
+    TableRow,
+    Typography,
+} from "@mui/material";
 
 export default function Orders() {
     const { setIsLoading } = useApplicationState();
@@ -64,13 +75,13 @@ export default function Orders() {
 
     return (
         <>
-            <Box>
+            <Container>
                 <NewOrderModal open={openModal} onClose={() => setOpenModal(false)} onSubmit={handleSubmitOrder} />
-                <Typography level="h4" fontWeight="xl" gutterBottom>
+                <Typography variant="h4" fontWeight="xl" gutterBottom>
                     Ordenes de venta
                 </Typography>
                 <br />
-                <Sheet variant="outlined" sx={{ p: 2 }}>
+                <Box sx={{ p: 2, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
                     <AppDatePicker
                         sx={{ m: 0, p: 0 }}
                         value={selectedDate}
@@ -79,77 +90,84 @@ export default function Orders() {
                     <Box>
                         <br />
                     </Box>
-                    <Table variant="outlined">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <Typography level="body-md" fontWeight="md">
-                                        Hora
-                                    </Typography>
-                                </th>
-                                <th>
-                                    <Typography level="body-md" fontWeight="md">
-                                        Descripción
-                                    </Typography>
-                                </th>
-                                <th>
-                                    <Typography level="body-md" fontWeight="md">
-                                        Metodo de Pago
-                                    </Typography>
-                                </th>
-                                <th>
-                                    <Typography level="body-md" fontWeight="md">
-                                        Costo
-                                    </Typography>
-                                </th>
-                                <th>
-                                    <Typography level="body-md" fontWeight="md">
-                                        Cargo
-                                    </Typography>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rows.length === 0 ? (
-                                <tr>
-                                    <td colSpan={5} style={{ textAlign: "center", padding: 20 }}>
-                                        No hay ordenes registradas
-                                    </td>
-                                </tr>
-                            ) : (
-                                rows.map((row) => (
-                                    <tr key={row.id}>
-                                        <td>{row.time}</td>
-                                        <td>{row.description}</td>
-                                        <td>{row.paymentMethod}</td>
-                                        <td>{formatNumberAsMoney(row.totalCost)}</td>
-                                        <td>{!row.totalCharge ? "Sin cargo" : formatNumberAsMoney(row.totalCharge)}</td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colSpan={3}>
-                                    <Typography level="body-lg" fontWeight="lg">
-                                        Total
-                                    </Typography>
-                                </td>
-                                <td>
-                                    <Typography level="body-lg" fontWeight="lg">
-                                        {formatNumberAsMoney(rows.reduce((total, row) => total + row.totalCost, 0))}
-                                    </Typography>
-                                </td>
-                                <td>
-                                    <Typography level="body-lg" fontWeight="lg">
-                                        {formatNumberAsMoney(rows.reduce((total, row) => total + row.totalCharge, 0))}
-                                    </Typography>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </Table>
-                </Sheet>
-            </Box>
+                    <TableContainer>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>
+                                        <Typography variant="body1" fontWeight="bold">
+                                            Hora
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body1" fontWeight="bold">
+                                            Descripción
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body1" fontWeight="bold">
+                                            Metodo de Pago
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body1" fontWeight="bold">
+                                            Costo
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body1" fontWeight="bold">
+                                            Cargo
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {rows.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                                            No hay ordenes registradas
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    rows.map((row) => (
+                                        <TableRow key={row.id}>
+                                            <TableCell>{row.time}</TableCell>
+                                            <TableCell>{row.description}</TableCell>
+                                            <TableCell>{row.paymentMethod}</TableCell>
+                                            <TableCell>{formatNumberAsMoney(row.totalCost)}</TableCell>
+                                            <TableCell>
+                                                {!row.totalCharge ? "Sin cargo" : formatNumberAsMoney(row.totalCharge)}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+
+                            <TableFooter>
+                                <TableRow>
+                                    <TableCell colSpan={3}>
+                                        <Typography variant="body1" fontWeight="bold">
+                                            Total
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body1" fontWeight="lg">
+                                            {formatNumberAsMoney(rows.reduce((total, row) => total + row.totalCost, 0))}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body1" fontWeight="lg">
+                                            {formatNumberAsMoney(
+                                                rows.reduce((total, row) => total + row.totalCharge, 0)
+                                            )}
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+                            </TableFooter>
+                        </Table>
+                    </TableContainer>
+                </Box>
+            </Container>
             <FAB onClick={() => setOpenModal(true)} />
         </>
     );

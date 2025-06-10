@@ -1,19 +1,3 @@
-import {
-    Box,
-    Button,
-    Divider,
-    FormControl,
-    FormLabel,
-    IconButton,
-    Modal,
-    ModalClose,
-    ModalDialog,
-    Option,
-    Select,
-    Sheet,
-    Table,
-    Typography,
-} from "@mui/joy";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import type { OrderItem } from "../../types/OrderItem";
 import { useEffect, useState } from "react";
@@ -24,6 +8,29 @@ import type { Order } from "../../types/Order";
 import newUuid from "../../utils/newUuid";
 import moment from "moment";
 import useApplicationState from "../../hooks/useApplicationState";
+import {
+    Box,
+    Button,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
 
 type Props = {
     open: boolean;
@@ -56,7 +63,7 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
     };
 
     const handleSelectProduct = (productId: string) => {
-        setSelectedProduct(products.find((product: Product) => product.id === productId) || null);
+        setSelectedProduct(products.find((product: Product) => product.id === productId) ?? null);
         if (productId) setShowProductModal(true);
     };
 
@@ -81,139 +88,158 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
         setSelectedProduct(null);
     };
 
+    const handleCloseProductDialog = () => {
+        setSelectedProduct(null);
+        setShowProductModal(false);
+    };
+
     return (
         <>
             <ProductModal
                 product={selectedProduct}
                 open={showProductModal}
-                onClose={() => setShowProductModal(false)}
+                onClose={handleCloseProductDialog}
                 onSubmit={handleAddOrderItem}
             />
-            <Modal open={open} onClose={handleClose}>
-                <ModalDialog variant="soft" layout="fullscreen" sx={{ height: 1 }}>
-                    <ModalClose onClick={onClose} />
-                    <Typography level="h4" component="h2" sx={{ mb: 2 }}>
+            <Dialog open={open} onClose={handleClose} fullScreen>
+                <DialogTitle sx={{ m: 0, p: 2 }}>
+                    <Typography component="p" variant="h5" sx={{ mb: 2 }}>
                         Nueva Orden
                     </Typography>
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 2,
-                            overflowY: "auto",
-                            minHeight: 0,
-                            flexGrow: 1,
-                        }}
-                    >
+                </DialogTitle>
+                <IconButton
+                    onClick={handleClose}
+                    sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: 8,
+                    }}
+                >
+                    <Close />
+                </IconButton>
+                <DialogContent dividers>
+                    <Container>
                         <Box
                             sx={{
                                 display: "flex",
                                 flexDirection: "column",
                                 gap: 2,
+                                overflowY: "auto",
+                                minHeight: 0,
+                                flexGrow: 1,
                             }}
-                            width={"50dvw"}
                         >
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 2,
+                                }}
+                                width={"50dvw"}
+                            >
+                                <FormControl sx={{ mt: 1 }}>
+                                    <InputLabel>Método de pago</InputLabel>
+                                    <Select
+                                        name="paymentMethod"
+                                        label="Metodo de pago"
+                                        value={paymentMethod}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                    >
+                                        {paymentMethods.map((pm: string) => (
+                                            <MenuItem key={pm} value={pm}>
+                                                {pm}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                            <Typography>Lista de Productos</Typography>
                             <FormControl>
-                                <FormLabel>Metodo de pago</FormLabel>
+                                <InputLabel>Seleccione un Producto</InputLabel>
                                 <Select
-                                    name="paymentMethod"
-                                    placeholder="Seleccion un método de pago"
-                                    value={paymentMethod}
-                                    onChange={(_, newValue) => setPaymentMethod(newValue as string)}
+                                    name="products"
+                                    label="Seleccione un producto"
+                                    defaultValue={""}
+                                    value={selectedProduct?.id ?? ""}
+                                    onChange={(e) => handleSelectProduct(e.target.value)}
                                 >
-                                    {paymentMethods.map((pm: string) => (
-                                        <Option key={pm} value={pm}>
-                                            {pm}
-                                        </Option>
+                                    <MenuItem value="">{"< Seleccione un producto >"}</MenuItem>
+                                    {products.map((product: Product) => (
+                                        <MenuItem key={product.id} value={product.id}>
+                                            {product.name} - ${product.price}
+                                        </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>
+                                                <Typography fontWeight="bold">Producto</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography fontWeight="bold">Cantidad</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography fontWeight="bold">Costo</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography fontWeight="bold">Cargo</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography fontWeight="bold">Eliminar</Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {orderItems.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={5} style={{ textAlign: "center" }}>
+                                                    No hay productos seleccionados
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : (
+                                            orderItems.map((item) => (
+                                                <TableRow key={item.id}>
+                                                    <TableCell>{item.name}</TableCell>
+                                                    <TableCell>{item.quantity}</TableCell>
+                                                    <TableCell>{formatNumberAsMoney(item.cost)}</TableCell>
+                                                    <TableCell>
+                                                        {!item.charge ? "Sin Cargo" : formatNumberAsMoney(item.charge)}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Button
+                                                            color="error"
+                                                            onClick={() => handleDeleteOrderItem(item.id)}
+                                                        >
+                                                            <DeleteOutlineIcon fontSize="small" />
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                         </Box>
-                        <Divider />
-                        <Typography level="title-md">Lista de Productos</Typography>
-                        <FormControl>
-                            <FormLabel>Seleccione un Producto</FormLabel>
-                            <Select
-                                name="products"
-                                defaultValue={null}
-                                value={null}
-                                onChange={(_, newValue) => handleSelectProduct(newValue as string)}
-                            >
-                                <Option value={null}>{"< Seleccione un producto >"}</Option>
-                                {products.map((product: Product) => (
-                                    <Option key={product.id} value={product.id}>
-                                        {product.name} - ${product.price}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <Sheet variant="outlined" sx={{ mt: 1, p: 1 }}>
-                            <Table>
-                                <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Cantidad</th>
-                                        <th>Costo</th>
-                                        <th>Cargo</th>
-                                        <th>Eliminar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {orderItems.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={5} style={{ textAlign: "center" }}>
-                                                No hay productos seleccionados
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        orderItems.map((item) => (
-                                            <tr key={item.id}>
-                                                <td>{item.name}</td>
-                                                <td>{item.quantity}</td>
-                                                <td>{formatNumberAsMoney(item.cost)}</td>
-                                                <td>{!item.charge ? "Sin Cargo" : formatNumberAsMoney(item.charge)}</td>
-                                                <td>
-                                                    <Button
-                                                        color="danger"
-                                                        size="sm"
-                                                        variant="plain"
-                                                        onClick={() => handleDeleteOrderItem(item.id)}
-                                                    >
-                                                        <DeleteOutlineIcon fontSize="small" />
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </Table>
-                        </Sheet>
-                    </Box>
-                    <Divider />
-                    <Box
-                        display="flex"
-                        gap={1}
-                        justifyContent="flex-end"
-                        sx={{
-                            position: "sticky",
-                            bottom: 0,
-                        }}
+                    </Container>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button variant="outlined" color="error" onClick={handleClose}>
+                        Cancelar
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSubmit}
+                        disabled={orderItems.length <= 0}
                     >
-                        <IconButton variant="outlined" color="danger" onClick={handleClose} sx={{ minWidth: 90 }}>
-                            Cancelar
-                        </IconButton>
-                        <IconButton
-                            variant="solid"
-                            color="primary"
-                            onClick={handleSubmit}
-                            sx={{ minWidth: 80 }}
-                            disabled={orderItems.length <= 0}
-                        >
-                            OK
-                        </IconButton>
-                    </Box>
-                </ModalDialog>
-            </Modal>
+                        OK
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }
