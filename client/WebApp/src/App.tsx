@@ -1,4 +1,4 @@
-import { Box } from "@mui/joy";
+import { Box } from "@mui/material";
 import Orders from "./components/Orders";
 import ApplicationState from "./providers/ApplicationState";
 

@@ -1,11 +1,24 @@
-import { Divider, IconButton, Modal, ModalClose, ModalDialog, Typography } from "@mui/joy";
 import type { Product } from "../../types/Product";
 import { useState } from "react";
-import { Box, FormControl, FormLabel, Checkbox } from "@mui/joy";
-import { Add, Remove } from "@mui/icons-material";
+import { Add, Close, Remove } from "@mui/icons-material";
 import formatNumberAsMoney from "../../utils/formatNumberAsMoney";
 import type { OrderItem } from "../../types/OrderItem";
 import newUuid from "../../utils/newUuid";
+import {
+    Box,
+    Button,
+    Checkbox,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    IconButton,
+    Typography,
+} from "@mui/material";
 
 type Props = {
     product: Product | null;
@@ -41,18 +54,28 @@ export default function ProductModal({ product, open, onClose, onSubmit }: Props
     };
 
     return (
-        <Modal open={open} onClose={handleClose} sx={{ zIndex: 1300 }}>
-            <ModalDialog variant="soft" layout="center" size="lg">
-                <Typography level="h4" component="h2">
+        <Dialog open={open} onClose={handleClose} sx={{ zIndex: 1300 }} fullWidth>
+            <DialogTitle>
+                <Typography variant="h6" component="p">
                     Nuevo Producto
                 </Typography>
-                <Divider />
-                <ModalClose onClick={onClose} />
-                <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+            </DialogTitle>
+            <IconButton
+                onClick={handleClose}
+                sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: 8,
+                }}
+            >
+                <Close />
+            </IconButton>
+            <DialogContent sx={{ p: 2, display: "flex", flexDirection: "column", gap: 2 }} dividers>
+                <Container>
                     {product && (
                         <Box display="flex" flexDirection="column" gap={1}>
-                            <Typography level="title-md">{product.name}</Typography>
-                            <Typography level="body-sm" color="neutral">
+                            <Typography>{product.name}</Typography>
+                            <Typography variant="body1" color="neutral">
                                 Precio: {formatNumberAsMoney(product.price)}
                             </Typography>
                         </Box>
@@ -60,46 +83,48 @@ export default function ProductModal({ product, open, onClose, onSubmit }: Props
                     <Box display="flex" flexDirection="column" gap={2}>
                         <FormControl>
                             <FormLabel>Cantidad</FormLabel>
-                            <Box display="flex" alignItems="center" gap={1}>
-                                <IconButton
-                                    variant="soft"
-                                    size="md"
-                                    color="danger"
+                            <br />
+                            <Box display="flex" alignItems="center" gap={2} sx={{ alignSelf: "center" }}>
+                                <Button
+                                    color="error"
+                                    variant="contained"
+                                    sx={{ borderRadius: 5 }}
                                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                                 >
                                     <Remove />
-                                </IconButton>
-                                <Typography level="body-lg" sx={{ minWidth: 32, textAlign: "center" }}>
+                                </Button>
+                                <Typography variant="h5" component="p" sx={{ minWidth: 32, textAlign: "center" }}>
                                     {quantity}
                                 </Typography>
-                                <IconButton
-                                    variant="soft"
-                                    size="md"
+                                <Button
                                     color="success"
+                                    variant="contained"
+                                    sx={{ borderRadius: 5 }}
                                     onClick={() => setQuantity((q) => q + 1)}
                                 >
                                     <Add />
-                                </IconButton>
+                                </Button>
                             </Box>
                         </FormControl>
                         <FormControl>
-                            <Checkbox
-                                checked={noCharge}
-                                onChange={(e) => setNoCharge(e.target.checked)}
+                            <FormControlLabel
+                                control={
+                                    <Checkbox checked={noCharge} onChange={(e) => setNoCharge(e.target.checked)} />
+                                }
                                 label="Sin cargo"
                             />
                         </FormControl>
                     </Box>
-                </Box>
-                <Box display="flex" gap={2} justifyContent="flex-end">
-                    <IconButton variant="outlined" color="danger" onClick={handleClose} sx={{ minWidth: 90 }}>
-                        Cancelar
-                    </IconButton>
-                    <IconButton variant="solid" color="primary" onClick={handleSubmit} sx={{ minWidth: 80 }}>
-                        OK
-                    </IconButton>
-                </Box>
-            </ModalDialog>
-        </Modal>
+                </Container>
+            </DialogContent>
+            <DialogActions>
+                <Button variant="outlined" color="error" onClick={handleClose}>
+                    Cancelar
+                </Button>
+                <Button variant="contained" color="primary" onClick={handleSubmit}>
+                    OK
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 }

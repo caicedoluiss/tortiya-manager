@@ -1,4 +1,4 @@
-import { CircularProgress, Sheet } from "@mui/joy";
+import { CircularProgress, Paper } from "@mui/material";
 import { createPortal } from "react-dom";
 
 type Props = {
@@ -8,7 +8,7 @@ export default function GlobalLoader({ open = false }: Props) {
     if (!open) return null;
 
     return createPortal(
-        <Sheet
+        <Paper
             sx={{
                 position: "fixed",
                 zIndex: 2000,
@@ -22,8 +22,8 @@ export default function GlobalLoader({ open = false }: Props) {
                 justifyContent: "center",
             }}
         >
-            <CircularProgress variant="soft" color="primary" />
-        </Sheet>,
+            <CircularProgress variant="indeterminate" color="primary" />
+        </Paper>,
         document.getElementById("global-loader")!
     );
 }
