@@ -31,6 +31,7 @@ import {
     Typography,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
+import { useNotifications } from "@toolpad/core/useNotifications";
 
 type Props = {
     open: boolean;
@@ -38,6 +39,7 @@ type Props = {
     onSubmit?: (order: Order) => void;
 };
 export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
+    const notifications = useNotifications();
     const { paymentMethods, products } = useApplicationState();
     const [paymentMethod, setPaymentMethod] = useState<string>("");
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -49,7 +51,13 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
     }, [paymentMethods]);
 
     const handleSubmit = () => {
-        if (orderItems.length <= 0) alert("Debe agregar al menos un producto a la orden.");
+        if (orderItems.length <= 0) {
+            notifications.show("Debe agregar al menos un producto a la orden.", {
+                autoHideDuration: 5000,
+                severity: "error",
+            });
+            return;
+        }
         clearState();
         const order: Order = {
             id: newUuid(),
@@ -72,10 +80,15 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
         setShowProductModal(false);
         setOrderItems((prevItems) => [...prevItems, item]);
         setSelectedProduct(null);
+        notifications.show(`Producto agregado: ${item.name} x${item.quantity}.`, {
+            autoHideDuration: 3000,
+            severity: "info",
+        });
     };
 
     const handleDeleteOrderItem = (itemId: string) => {
         setOrderItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+        notifications.show("Producto eliminado de la orden.", { autoHideDuration: 3000, severity: "warning" });
     };
 
     const handleClose = () => {
