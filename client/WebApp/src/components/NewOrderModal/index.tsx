@@ -63,6 +63,7 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
     };
 
     const handleSelectProduct = (productId: string) => {
+        setShowProductModal(true);
         setSelectedProduct(products.find((product: Product) => product.id === productId) ?? null);
         if (productId) setShowProductModal(true);
     };
@@ -101,7 +102,7 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
                 onClose={handleCloseProductDialog}
                 onSubmit={handleAddOrderItem}
             />
-            <Dialog open={open} onClose={handleClose} fullScreen>
+            <Dialog open={open} onClose={handleClose} fullWidth>
                 <DialogTitle sx={{ m: 0, p: 2 }}>
                     <Typography component="p" variant="h5" sx={{ mb: 2 }}>
                         Nueva Orden

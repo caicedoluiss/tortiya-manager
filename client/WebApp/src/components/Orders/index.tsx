@@ -34,7 +34,7 @@ export default function Orders() {
             setOrders(orders);
             setIsLoading(false);
         },
-        [getAllByDate, setIsLoading]
+        [getAllByDate, setIsLoading],
     );
 
     useEffect(() => {
@@ -55,7 +55,7 @@ export default function Orders() {
                 totalCost: order.items.reduce((total, item) => total + item.cost * item.quantity, 0),
                 totalCharge: order.items.reduce(
                     (total, item) => total + (!item.charge ? 0 : item.charge * item.quantity),
-                    0
+                    0,
                 ),
             })) ?? []
         );
@@ -77,9 +77,6 @@ export default function Orders() {
         <>
             <Container>
                 <NewOrderModal open={openModal} onClose={() => setOpenModal(false)} onSubmit={handleSubmitOrder} />
-                <Typography variant="h4" fontWeight="xl" gutterBottom>
-                    Ordenes de venta
-                </Typography>
                 <br />
                 <Box sx={{ p: 2, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
                     <AppDatePicker
@@ -158,7 +155,7 @@ export default function Orders() {
                                     <TableCell>
                                         <Typography variant="body1" fontWeight="lg">
                                             {formatNumberAsMoney(
-                                                rows.reduce((total, row) => total + row.totalCharge, 0)
+                                                rows.reduce((total, row) => total + row.totalCharge, 0),
                                             )}
                                         </Typography>
                                     </TableCell>
