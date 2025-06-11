@@ -1,4 +1,4 @@
-// import { es } from "date-fns/locale/es";
+import { es } from "date-fns/locale/es";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
@@ -11,7 +11,7 @@ type Props = {
 
 export default function AppDatePicker({ value, onChange, sx, disablePast = false }: Props) {
     return (
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
             <DatePicker
                 label="Fecha"
                 sx={sx}
@@ -19,6 +19,7 @@ export default function AppDatePicker({ value, onChange, sx, disablePast = false
                 value={value}
                 onChange={(date) => onChange(date)}
                 disablePast={disablePast}
+                format="yyyy-MM-dd"
                 disableFuture
             />
         </LocalizationProvider>
