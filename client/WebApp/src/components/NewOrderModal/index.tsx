@@ -49,12 +49,12 @@ export default function NewOrderModal({ open, onClose, onSubmit }: Props) {
     }, [paymentMethods]);
 
     const handleSubmit = () => {
-        if (orderItems.length <= 0) alert("Debe agregar al menos un product a la orden.");
+        if (orderItems.length <= 0) alert("Debe agregar al menos un producto a la orden.");
         clearState();
         const order: Order = {
             id: newUuid(),
             date: moment().format(),
-            paymentMethod: paymentMethod,
+            paymentMethod: orderItems.every((item) => !item.charge) ? null : paymentMethod,
             items: orderItems,
         };
         onSubmit?.(order);
