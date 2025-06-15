@@ -1,0 +1,52 @@
+name: tortiya_manager-debug_db
+services:
+    sql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        pull_policy: if_not_present
+        container_name: tortiya_manager-debug_db-sql
+        ports:
+            - "1433:1433"
+        networks:
+            - tortiya_manager
+        volumes:
+            - tortiya_manager:/var/opt/mssql
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_PID=Developer
+            - MSSQL_SA_PASSWORD=P@55word
+        healthcheck:
+            test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P P@55word -C -Q 'SELECT 1' || exit 1"]
+            interval: 10s
+            start_period: 10s
+            timeout: 5s
+            retries: 5
+    migrations_job:
+        depends_on:
+            sql:
+                condition: service_healthy # Waits until container is healthy
+        build:
+            context: ../../
+            dockerfile: ./server/TortiYaManager.WebAPI/Dockerfile
+        image: tortiya_manager-api:debug
+        container_name: tortiya_manager-debug_db-migrations_job
+        pull_policy: build
+        networks:
+            - tortiya_manager
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Debug
+            - CosmosDbSettings__DbName=
+            - CosmosDbSettings__AccountEndpoint=
+            - CosmosDbSettings__AccountKey=
+            - JwtSettings__Issuer=http://localhost:8080
+            - JwtSettings__Audience=http://localhost:8080
+            - JwtSettings__Secret=ThisIsASecretKeyForTestingPurposes
+            - JwtSettings__TtlMinutes=60
+            - ConnectionStrings__SqlDb=Server=tortiya_manager-debug_db-sql;Database=TortiYaManager;User Id=sa;Password=P@55word;TrustServerCertificate=True;
+        command: [TortiYaManager.WebAPI.dll, migrate]
+volumes:
+    tortiya_manager:
+        name: tortiya_manager-debug_db
+networks:
+    tortiya_manager:
+        name: tortiya_manager-debug_db
+        driver: bridge

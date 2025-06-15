@@ -4,7 +4,7 @@ using TortiYaManager.Core.Sales;
 
 namespace TortiYaManager.Infrastructure.Repositories.Sales;
 
-public sealed class OrdersRepository(ApplicationDbContext context) : IOrdersRespository
+public sealed class OrdersRepository(ApplicationDbContext context) : IOrdersRepository
 {
     public Order Create(Order order)
     {

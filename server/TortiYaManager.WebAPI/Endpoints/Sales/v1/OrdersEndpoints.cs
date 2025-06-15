@@ -13,7 +13,7 @@ using TortiYaManager.Application.Sales.Queries;
 
 namespace TortiYaManager.WebAPI.Endpoints.Sales.v1;
 
-public class OrdersEndpoints : IEndpoint
+public sealed class OrdersEndpoints : IEndpoint
 {
     #region Requests models
 
@@ -32,10 +32,12 @@ public class OrdersEndpoints : IEndpoint
     {
         var basePath = WebAPIUtils.BuildEndpointRoute(prefix, "orders");
         app.MapGet($"{basePath}/{{clientDate}}", GetOrdersByDate)
-            .WithName("GetOrders")
+            .WithName(nameof(GetOrdersByDate))
             .WithTags("Orders")
             .Produces<GetOrdersResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
-            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError, MediaTypeNames.Application.Json);
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError, MediaTypeNames.Application.Json)
+            .RequireAuthorization();
 
         app.MapPost($"{basePath}", CreateOrder)
             .WithName("CreateOrder")
@@ -43,7 +45,9 @@ public class OrdersEndpoints : IEndpoint
             .Accepts<CreateOrderRequest>(MediaTypeNames.Application.Json)
             .Produces<CreateOrderResponse>(StatusCodes.Status201Created, MediaTypeNames.Application.Json)
             .Produces<ErrorResponse>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)
-            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError, MediaTypeNames.Application.Json);
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError, MediaTypeNames.Application.Json)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> GetOrdersByDate(

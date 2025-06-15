@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using SharedLib.CQRS;
+using TortiYaManager.Application.Auth;
 using TortiYaManager.Application.Sales.Commands;
 using TortiYaManager.Application.Sales.Queries;
 
@@ -9,6 +10,8 @@ public static class ApplicationServices
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        AddAuthServices(services);
+
         // Register the AppRequestsMediator
         services.AddScoped<IAppRequestsMediator, AppRequestsMediator>();
         // Register App Queries and Commands
@@ -25,8 +28,13 @@ public static class ApplicationServices
         services.AddScoped<IAppRequestHandler<GetOrdersByDateQuery.QueryArgs, GetOrdersByDateQuery.QueryResult>, GetOrdersByDateQuery.Handler>();
     }
 
-    public static void AddCommands(IServiceCollection services)
+    private static void AddCommands(IServiceCollection services)
     {
         services.AddScoped<IAppRequestHandler<CreateOrderCommand.CommandArgs, CreateOrderCommand.CommandResult>, CreateOrderCommand.Handler>();
+    }
+
+    private static void AddAuthServices(IServiceCollection services)
+    {
+        services.AddSingleton<IEmailValidator, EmailValidator>();
     }
 }

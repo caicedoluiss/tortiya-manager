@@ -9,7 +9,7 @@ public class GetOrdersByDateQuery
     public record QueryArgs(string ClientDate);
     public record QueryResult(IEnumerable<OrderDto> Orders);
 
-    public class Handler(IOrdersRespository respository) : AppRequestHandler<QueryArgs, QueryResult>
+    public class Handler(IOrdersRepository respository) : AppRequestHandler<QueryArgs, QueryResult>
     {
         protected override async Task<QueryResult> ExecuteAsync(QueryArgs args, CancellationToken cancellationToken = default)
         {

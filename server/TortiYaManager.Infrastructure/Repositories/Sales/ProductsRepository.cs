@@ -4,7 +4,7 @@ using TortiYaManager.Core.Sales;
 
 namespace TortiYaManager.Infrastructure.Repositories.Sales;
 
-public sealed class ProductsRespository(ApplicationDbContext context) : IProductsRepository
+public sealed class ProductsRepository(ApplicationDbContext context) : IProductsRepository
 {
     public async Task<IReadOnlyCollection<Product>> GetAllAsync(bool track = false, CancellationToken cancellationToken = default)
     {

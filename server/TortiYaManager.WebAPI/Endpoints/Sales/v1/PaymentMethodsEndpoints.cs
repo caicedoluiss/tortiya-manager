@@ -10,7 +10,7 @@ using TortiYaManager.Application.Sales.Queries;
 
 namespace TortiYaManager.WebAPI.Endpoints.Sales.v1;
 
-public class PaymentMethodsEndpoints : IEndpoint
+public sealed class PaymentMethodsEndpoints : IEndpoint
 {
     public record GetPaymentMethodsResponse(IEnumerable<string> PaymentMethods);
 
@@ -21,7 +21,9 @@ public class PaymentMethodsEndpoints : IEndpoint
             .WithName(nameof(GetPaymentMethods))
             .WithTags("Payment Methods")
             .Produces<GetPaymentMethodsResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
-            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError, MediaTypeNames.Application.Json);
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError, MediaTypeNames.Application.Json)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> GetPaymentMethods(

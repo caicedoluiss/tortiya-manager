@@ -9,7 +9,7 @@ public class CreateOrderCommand
     public record CommandArgs(NewOrderDto NewOrder);
     public record CommandResult(OrderDto Order);
 
-    public class Handler(IOrdersRespository repository) : AppRequestHandler<CommandArgs, CommandResult>
+    public class Handler(IOrdersRepository repository) : AppRequestHandler<CommandArgs, CommandResult>
     {
         protected override Task<CommandResult> ExecuteAsync(CommandArgs args, CancellationToken cancellationToken = default)
         {

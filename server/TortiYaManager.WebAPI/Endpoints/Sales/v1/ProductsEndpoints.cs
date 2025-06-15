@@ -11,7 +11,7 @@ using TortiYaManager.Application.Sales.Queries;
 
 namespace TortiYaManager.WebAPI.Endpoints.Sales.v1;
 
-public class ProductsEndpoints : IEndpoint
+public sealed class ProductsEndpoints : IEndpoint
 {
     public record GetProductsResponse(IEnumerable<ProductDto> Products);
 
@@ -23,7 +23,9 @@ public class ProductsEndpoints : IEndpoint
             .WithName("GetProducts")
             .WithTags("Products")
             .Produces<GetProductsResponse>(StatusCodes.Status200OK)
-            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError);
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status500InternalServerError)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> GetProducts(
