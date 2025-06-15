@@ -1,6 +1,29 @@
 name: tortiya_manager
 services:
+    sql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        pull_policy: if_not_present # always, missing, never, build
+        container_name: tortiya_manager-sql
+        ports:
+            - "1433:1433"
+        networks:
+            - tortiya_manager
+        volumes:
+            - tortiya_manager:/var/opt/mssql
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_PID=Express
+            - MSSQL_SA_PASSWORD=P@55word
+        healthcheck:
+            test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P P@55word -C -Q 'SELECT 1' || exit 1"]
+            interval: 10s
+            start_period: 10s
+            timeout: 5s
+            retries: 5
     migrations_job:
+        depends_on:
+            sql:
+                condition: service_healthy # Waits until container is healthy
         build:
             context: .
             dockerfile: ./server/TortiYaManager.WebAPI/Dockerfile
@@ -14,6 +37,11 @@ services:
             - CosmosDbSettings__DbName=
             - CosmosDbSettings__AccountEndpoint=
             - CosmosDbSettings__AccountKey=
+            - JwtSettings__Issuer=http://localhost:8080
+            - JwtSettings__Audience=http://localhost:8080
+            - JwtSettings__Secret=ThisIsASecretKeyForTestingPurposes
+            - JwtSettings__TtlMinutes=60
+            - ConnectionStrings__SqlDb=Server=tortiya_manager-sql;Database=TortiYaManager;User Id=sa;Password=P@55word;TrustServerCertificate=True;
     api:
         depends_on:
             migrations_job:
@@ -31,7 +59,15 @@ services:
             - CosmosDbSettings__DbName=
             - CosmosDbSettings__AccountEndpoint=
             - CosmosDbSettings__AccountKey=
+            - JwtSettings__Issuer=http://localhost:8080
+            - JwtSettings__Audience=http://localhost:8080
+            - JwtSettings__Secret=ThisIsASecretKeyForTestingPurposes
+            - JwtSettings__TtlMinutes=60
+            - ConnectionStrings__SqlDb=Server=tortiya_manager-sql;Database=TortiYaManager;User Id=sa;Password=P@55word;TrustServerCertificate=True;
     webapp:
+        depends_on:
+            api:
+                condition: service_started # Waits until container is started
         build:
             context: ./client/WebApp
             dockerfile: Dockerfile
@@ -44,7 +80,10 @@ services:
             - "8081:80"
         networks:
             - tortiya_manager
+volumes:
+    tortiya_manager:
+        name: tortiya_manager
 networks:
     tortiya_manager:
-        name: tortiya_manager-debug
+        name: tortiya_manager
         driver: bridge

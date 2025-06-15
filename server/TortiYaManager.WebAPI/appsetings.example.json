@@ -1,14 +1,23 @@
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    },
+    "AllowedHosts": "*",
+    "CosmosDbSettings": {
+        "DbName": "",
+        "AccountEndpoint": "",
+        "AccountKey": ""
+    },
+    "JwtSettings": {
+        "Issuer": "",
+        "Audience": "",
+        "Secret": "",
+        "TtlMinutes": 0
+    },
+    "ConnectionStrings": {
+        "SqlDb": ""
     }
-  },
-  "AllowedHosts": "*",
-  "CosmosDbSettings": {
-    "DbName": "",
-    "AccountEndpoint": "",
-    "AccountKey": ""
-  }
 }
