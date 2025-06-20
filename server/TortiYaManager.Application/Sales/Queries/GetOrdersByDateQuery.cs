@@ -9,12 +9,12 @@ public class GetOrdersByDateQuery
     public record QueryArgs(string ClientDate);
     public record QueryResult(IEnumerable<OrderDto> Orders);
 
-    public class Handler(IOrdersRepository respository) : AppRequestHandler<QueryArgs, QueryResult>
+    public class Handler(IOrdersRepository repository) : AppRequestHandler<QueryArgs, QueryResult>
     {
         protected override async Task<QueryResult> ExecuteAsync(QueryArgs args, CancellationToken cancellationToken = default)
         {
             var clientDate = Utils.ParseIso8601DateTimeString(args.ClientDate);
-            var result = await respository.GetByDateAsync(clientDate, cancellationToken: cancellationToken);
+            var result = await repository.GetByDateAsync(clientDate, cancellationToken: cancellationToken);
 
             return new(result.Select(x => OrderDto.FromCore(x)));
         }

@@ -1,11 +1,17 @@
 import { Box } from "@mui/material";
 import ApplicationState from "./providers/ApplicationState";
-import { AppProvider, type Branding } from "@toolpad/core/AppProvider";
+import { ReactRouterAppProvider } from "@toolpad/core/react-router";
 import { NotificationsProvider } from "@toolpad/core/useNotifications";
-import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet, RouterProvider, useNavigate } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import OrdersPage from "./components/pages/OrdersPage";
 import ErrorPage from "./components/pages/ErrorPage";
+import LoginPage from "./components/pages/LoginPage";
+import type { Authentication, Branding } from "@toolpad/core/AppProvider";
+import { useMemo } from "react";
+import AuthenticationProvider from "./providers/AuthenticationProvider";
+import useAuthentication from "./hooks/useAuthentication";
+import RegisterPage from "./components/pages/RegisterPage";
 
 const router = createBrowserRouter([
     {
@@ -25,7 +31,15 @@ const router = createBrowserRouter([
                         path: "/orders",
                         element: <OrdersPage />,
                     },
+                    {
+                        path: "/register",
+                        element: <RegisterPage />,
+                    },
                 ],
+            },
+            {
+                path: "/login",
+                element: <LoginPage />,
             },
         ],
     },
@@ -34,21 +48,39 @@ const router = createBrowserRouter([
 const BRANDING: Branding = {
     title: "TortiYa Manager",
     homeUrl: "/",
-    logo: <img src="/favicon.svg" alt="logo.svg" style={{ borderRadius: "50%" }} />,
+    logo: <img src="/favicon.svg" alt="logo.svg" style={{ width: 40, height: 40, borderRadius: "50%" }} />,
 };
 
 function App() {
-    return <RouterProvider router={router} />;
+    return (
+        <AuthenticationProvider>
+            <RouterProvider router={router} />
+        </AuthenticationProvider>
+    );
 }
 
 function TortiYaManagerApp() {
+    const navigate = useNavigate();
+    const { session, setJwt } = useAuthentication();
+
+    const authentication: Authentication = useMemo(
+        () => ({
+            signIn: () => navigate("/login"),
+            signOut: () => {
+                setJwt(null);
+                navigate("/", { replace: true });
+            },
+        }),
+        [navigate, setJwt],
+    );
+
     return (
         <Box id="app">
             <NotificationsProvider>
                 <ApplicationState>
-                    <AppProvider branding={BRANDING}>
+                    <ReactRouterAppProvider branding={BRANDING} authentication={authentication} session={session}>
                         <Outlet />
-                    </AppProvider>
+                    </ReactRouterAppProvider>
                 </ApplicationState>
             </NotificationsProvider>
         </Box>

@@ -1,10 +1,13 @@
 import Orders from "../Orders";
 import AppPageContainer from "./AppPageContainer";
+import PrivateRoutePageWrapper from "./PrivateRoutePageWrapper";
 
 export default function OrdersPage() {
     return (
-        <AppPageContainer title="Ordenes">
-            <Orders />
-        </AppPageContainer>
+        <PrivateRoutePageWrapper>
+            <AppPageContainer title="Ordenes">
+                <Orders />
+            </AppPageContainer>
+        </PrivateRoutePageWrapper>
     );
 }

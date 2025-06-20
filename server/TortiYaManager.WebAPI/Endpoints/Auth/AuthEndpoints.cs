@@ -13,7 +13,7 @@ namespace TortiYaManager.WebAPI.Endpoints.Auth;
 public sealed class AuthEndpoints : IEndpoint
 {
     public record RegisterRequest(string FirstName, string LastName, string Email, string Password, AppUserRole UserRole);
-    public record LoginRequest(string Email, string Password);
+    public record LoginRequest(string UserName, string Password);
     public record LoginResponse(string Jwt);
 
     public static void Map(IEndpointRouteBuilder app, string? prefix = null)
@@ -49,7 +49,7 @@ public sealed class AuthEndpoints : IEndpoint
 
     private static async Task<IResult> Login([FromServices] IAuthManagerService authManagerService, [FromBody] LoginRequest request)
     {
-        var jwt = await authManagerService.LoginAsync(request.Email, request.Password);
+        var jwt = await authManagerService.LoginAsync(request.UserName, request.Password);
         return jwt is not null ?
             Results.Ok(new LoginResponse(jwt)) :
             Results.BadRequest(new ErrorResponse([("credentials", "Invalid email or password.")]));
