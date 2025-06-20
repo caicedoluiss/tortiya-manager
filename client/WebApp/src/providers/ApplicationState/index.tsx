@@ -4,12 +4,14 @@ import usePaymentMethods from "../../hooks/usePaymentMethods";
 import useProducts from "../../hooks/useProducts";
 import type { Product } from "../../types/Product";
 import GlobalLoader from "../../components/GlobalLoader";
+import useAuthentication from "../../hooks/useAuthentication";
 
 type Props = {
     children: ReactElement | ReactElement[];
 };
 
 export default function ApplicationState({ children }: Props) {
+    const { session } = useAuthentication();
     const { getAll: getAllPaymentMethods } = usePaymentMethods();
     const { getAll: getAllProducts } = useProducts();
     const [isFetching, setIsFetching] = useState<boolean>(false);
@@ -17,11 +19,12 @@ export default function ApplicationState({ children }: Props) {
     const [state, setState] = useState<{ paymentMethods: string[]; products: Product[] }>(defaultValue);
 
     const fetchData = useCallback(async () => {
+        if (!session) return;
         setIsFetching(true);
         const [paymentMethods, products] = await Promise.all([getAllPaymentMethods(), getAllProducts()]);
         setIsFetching(false);
         setState({ products, paymentMethods });
-    }, [getAllPaymentMethods, getAllProducts]);
+    }, [getAllPaymentMethods, getAllProducts, session]);
 
     useEffect(() => {
         let fetch = true;
@@ -38,7 +41,7 @@ export default function ApplicationState({ children }: Props) {
             products: state.products,
             setIsLoading,
         }),
-        [state]
+        [state],
     );
 
     return (

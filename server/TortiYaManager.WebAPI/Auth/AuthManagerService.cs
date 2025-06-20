@@ -54,8 +54,8 @@ public sealed class AuthManagerService(
         async Task<(string, string)?> Validate()
         {
             if (!Enum.IsDefined<AppUserRole>(role)) return ("role", "Invalid value.");
-            if (string.IsNullOrEmpty(user.FirstName.Trim())) return ("firstName", "Required value.");
-            if (string.IsNullOrEmpty(user.LastName.Trim())) return ("lastName", "Required value.");
+            if (string.IsNullOrEmpty(user.FirstName?.Trim())) return ("firstName", "Required value.");
+            if (string.IsNullOrEmpty(user.LastName?.Trim())) return ("lastName", "Required value.");
             if (!emailValidator.IsValid(user.Email)) return ("email", "Invalid value.");
             if ((await userManager.FindByEmailAsync(user.Email!)) is not null) return ("email", "Value must be unique.");
 
@@ -69,11 +69,11 @@ public sealed class AuthManagerService(
         }
     }
 
-    public async Task<string?> LoginAsync(string userName, string password)
+    public async Task<string?> LoginAsync(string email, string password)
     {
-        bool isEmail = emailValidator.IsValid(userName);
+        bool isEmail = emailValidator.IsValid(email);
         if (!isEmail) return null;
-        var user = await userManager.FindByNameAsync(userName.Trim());
+        var user = await userManager.FindByNameAsync(email.Trim());
         if (user is null || !await userManager.CheckPasswordAsync(user, password)) return null;
 
         // Create Identity
